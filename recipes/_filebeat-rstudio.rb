@@ -32,7 +32,7 @@ template "#{node['filebeat']['base_dir']}/filebeat-rstudio.yml" do
   group rstudio_group
   mode 0655
   variables({
-              :paths => log_glob,
+              :paths => [log_glob],
               :multiline => false,
               :fields => false,
               :logstash_endpoint => logstash_endpoint,
