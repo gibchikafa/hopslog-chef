@@ -15,6 +15,8 @@
     output { pipeline { send_to => ["services"] } }
 - pipeline.id: services
   path.config: "<%= node['logstash']['base_dir'] %>/config/services.conf"
+- pipeline.id: onlinefs
+  path.config: "<%= node['logstash']['base_dir'] %>/config/onlinefs.conf"
 <% if @managed_cloud -%>
 - pipeline.id: services_managed_cloud
   path.config: "<%= node['logstash']['base_dir'] %>/config/services_managed_cloud.conf"

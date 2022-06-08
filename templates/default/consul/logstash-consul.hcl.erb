@@ -62,5 +62,17 @@ services = [
             id = "logstash-beats-jupyter-check"
             alias_service = "logstash/http"
         }
+    },
+    {
+    id = "logstash/git"
+        name = "logstash"
+        tags = [
+            "onlinefs"
+        ]
+        port = <%= node['logstash']['beats']['onlinefs_port']  %>
+        check = {
+            id = "logstash-beats-git-check"
+            alias_service = "logstash/http"
+        }
     }
 ]

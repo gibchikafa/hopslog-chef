@@ -1,0 +1,75 @@
+input {
+beats {
+port => <%= node['logstash']['beats']['spark_port'] %>
+}
+}
+
+filter {
+mutate {
+add_field => [ "projectId", "" ]
+}
+mutate {
+add_field => [ "fgId", "" ]
+}
+mutate {
+add_field => [ "fgName", ""]
+}
+
+grok {
+match => {"message" => "(?<templogdate>%{YEAR}-%{MONTHNUM2}-%{MONTHDAY} %{HOUR}:%{MINUTE}:%{SECOND}.%{NONNEGINT}) %{LOGLEVEL:priority} %{DATA:fgInfo} %{DATA:logger_name}: %{GREEDYDATA:log_message}"}
+  }
+
+  #Ignore failed parse enties. Grok filter has been tested with http://grokconstructor.appspot.com
+  if "_grokparsefailure" in [tags] {
+  drop { }
+  }
+
+  mutate {
+  split => ["fgInfo", ","]
+  }
+
+  date {
+  match  => [ "templogdate", ISO8601 ]
+  target => "logdate"
+  }
+
+  mutate {
+  remove_field => [ "[host]" ]
+  }
+
+  mutate {
+  add_field => {
+  "host" => "%{[agent][hostname]}"
+  }
+  }
+
+  mutate {
+  replace => [ "projectId", "%{[fgInfo][0]}"]
+  }
+  mutate {
+  replace => [ "fgId", "%{[fgInfo][1]}"]
+  }
+  mutate {
+  replace => [ "fgName", "%{[fgInfo][2]}"]
+  }
+
+  mutate {
+  remove_field => [ "message", "source" , "templogdate", "prospector", "agent", "jobinfo", "log", "input", "ecs"]
+  }
+
+  }
+
+  output {
+  opensearch {
+  hosts => [<%= @elastic_addr %>]
+  index => "onlinefs_logs-%{+YYYY.MM.dd}"
+  <% if node['elastic']['opensearch_security']['enabled'] %>
+    user => "<%=node['elastic']['opensearch_security']['logstash']['username']%>"
+    password => "<%=node['elastic']['opensearch_security']['logstash']['password']%>"
+    <% if node['elastic']['opensearch_security']['https']['enabled'] %>
+      cacert => "<%= @hops_ca %>"
+      ssl => true
+    <% end %>
+  <% end %>
+  }
+  }

@@ -21,6 +21,7 @@ default['logstash']['beats']['python_jobs_port']             = "5051"
 default['logstash']['beats']['jupyter_port']                 = "5052"
 default['logstash']['beats']['services_port']                = "5053"
 default['logstash']['http']['port']                          = "9600"
+default['logstash']['beats']['onlinefs_port']                = "5056"
 
 default['logstash']['systemd']                  = "true"
 default['logstash']['home']                     = node['hopslog']['dir'] + "/logstash-" + "#{node['logstash']['version']}"
@@ -108,4 +109,7 @@ default['logstash']['managed_cloud']['pipeline']['ordered']                     
 
 #opensearch-dashboards logo
 default['opensearch-dashboards']['logo'] = "search-400x70.png"
+
+default['filebeat']['onlinefs_read_logs'] = "/srv/hops/onlinefs/logs/onlinefs.log"
+
 

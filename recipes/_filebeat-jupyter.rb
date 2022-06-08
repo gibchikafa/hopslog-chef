@@ -42,6 +42,8 @@ template "#{node['filebeat']['base_dir']}/filebeat-jupyter.yml" do
   })
 end
 
+include_recipe "hopslog::_filebeat-onlinefs"
+
 template "#{node['filebeat']['base_dir']}/bin/start-filebeat-jupyter.sh" do
   source "start-filebeat.sh.erb"
   user jupyter_owner
